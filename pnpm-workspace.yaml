@@ -1,0 +1,14 @@
+allowBuilds:
+  esbuild: true
+catalog:
+  vite: npm:@voidzero-dev/vite-plus-core@1.3.0
+  vite-plus: 1.3.0
+minimumReleaseAgeExclude:
+    - typesynth@0.1.0 || 0.1.1
+overrides:
+  vite@*: "catalog:"
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: "*"

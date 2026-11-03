@@ -1,0 +1,54 @@
+{
+  "name": "@signal-spec/react-client",
+  "version": "0.1.0",
+  "description": "A SignalR client generator for React based on the SignalSpec.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/IvanKobtsev/SignalSpec.ReactClient.git"
+  },
+  "files": [
+    "dist",
+    "bin",
+    "src/generation"
+  ],
+  "type": "module",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./package.json": "./package.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "dev": "vp pack --watch",
+    "test": "vp test",
+    "check": "vp check",
+    "prepublishOnly": "vp run build",
+    "generate": "node ./bin/signal-spec.mjs generate"
+  },
+  "dependencies": {
+    "typesynth": "0.1.1",
+    "zustand": "^5.0.16"
+  },
+  "peerDependencies": {
+    "@microsoft/signalr": "^10.0.11",
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "@types/react": "^19.3.0",
+    "typescript": "^7.0.2",
+    "vite-plus": "catalog:"
+  },
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "12.16.1",
+      "onFail": "download"
+    }
+  },
+  "bin": {
+    "signal-spec": "bin/signal-spec.mjs"
+  }
+}

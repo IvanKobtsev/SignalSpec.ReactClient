@@ -1,0 +1,56 @@
+import { useEffect, useState } from 'react';
+import * as SignalR from '@microsoft/signalr';
+import { useSignalRConnections } from '@/services/signalR/SignalRConnectionsProvider.tsx';
+import { EnableSignalRDebugInformation } from '@/application/constants/env-variables.ts';
+import { useStableHandlers } from '@/helpers/useStableHandlers.ts';
+
+
+
+
+
+//--------------------------------------------------------------------------------------------------------------
+// Hubs
+//--------------------------------------------------------------------------------------------------------------
+
+
+
+//--------------------------------------------------------------------------------------------------------------
+// DTOs
+//--------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+{{#each x-signal-r-client.hubs}}
+
+
+{{/each}}
+
+//--------------------------------------------------------------------------------------------------------------
+// Change tracking
+//--------------------------------------------------------------------------------------------------------------
+
+export enum DomainType {
+{{#each x-domain-types.types}}
+  {{this}} = '{{this}}',
+{{/each}}
+}
+
+{{#each x-domain-types.payloads}}
+  export interface {{@key}} {
+  {{#each properties}}
+    {{name}}: {{safeType this}},
+  {{/each}}
+  }
+{{/each}}
+
+export type DomainTypePayloadMap = {
+{{#each x-domain-types.types}}
+  {{#if (lookup ../x-domain-types.payloads (concat this "Payload"))}}
+      [DomainType.{{this}}]: {{this}}Payload;
+  {{/if}}
+{{/each}}
+};
+
+export const SIGNAL_R_CLIENT_CHECKSUM = "{{magic__checksum}}";

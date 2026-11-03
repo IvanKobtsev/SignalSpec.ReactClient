@@ -1,0 +1,5 @@
+import { useSignalRConnectionsStore } from "@signal-spec/react-client";
+
+export const backendUri = {{{backendUriLiteral}}};
+export const EnableSignalRDebug = false;
+useSignalRConnectionsStore.setState({ backendUri, EnableSignalRDebug });
