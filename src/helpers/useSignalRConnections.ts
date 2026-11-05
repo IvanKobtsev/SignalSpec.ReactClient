@@ -6,9 +6,7 @@ export interface SignalRConnectionData {
   componentsSubscribed: number;
 }
 
-export function isConnectionAlive(
-  connectionState: SignalR.HubConnectionState | null | undefined,
-) {
+export function isConnectionAlive(connectionState: SignalR.HubConnectionState | null | undefined) {
   return (
     connectionState &&
     connectionState !== SignalR.HubConnectionState.Disconnected &&
@@ -16,10 +14,7 @@ export function isConnectionAlive(
   );
 }
 
-export interface SignalRConnectionsStore {
-  backendUri: string;
-  EnableSignalRDebug: boolean;
-  connectionsStore: Map<string, SignalRConnectionData>;
+export interface SignalRConnections {
   createConnection: (hubName: string) => Promise<SignalRConnectionData>;
   setupEventHandlers: <T>(
     hubName: string,
@@ -29,7 +24,13 @@ export interface SignalRConnectionsStore {
   deleteConnection: <T>(hubName: string, handlers: Partial<T>) => void;
 }
 
-export const useSignalRConnectionsStore = create<SignalRConnectionsStore>((set, get) => ({
+interface SignalRConnectionsStore extends SignalRConnections {
+  backendUri: string;
+  EnableSignalRDebug: boolean;
+  connectionsStore: Map<string, SignalRConnectionData>;
+}
+
+const useSignalRConnectionsStore = create<SignalRConnectionsStore>((set, get) => ({
   backendUri: "",
   EnableSignalRDebug: false,
   connectionsStore: new Map(),
@@ -41,7 +42,9 @@ export const useSignalRConnectionsStore = create<SignalRConnectionsStore>((set, 
       data = {
         connection: new SignalR.HubConnectionBuilder()
           .withUrl(backendUri + "/hubs/" + hubName, { withCredentials: true })
-          .configureLogging(EnableSignalRDebug ? SignalR.LogLevel.Information : SignalR.LogLevel.None)
+          .configureLogging(
+            EnableSignalRDebug ? SignalR.LogLevel.Information : SignalR.LogLevel.None,
+          )
           .withAutomaticReconnect()
           .build(),
         componentsSubscribed: 0,
@@ -62,8 +65,9 @@ export const useSignalRConnectionsStore = create<SignalRConnectionsStore>((set, 
     let data = get().connectionsStore.get(hubName);
     if (!data) {
       data = await get().createConnection(hubName);
-      onConnected?.(data.connection);
     }
+    onConnected?.(data.connection);
+
     for (const key of Object.keys(handlers) as (keyof typeof handlers)[]) {
       const handler = handlers[key];
       if (handler !== undefined) {
@@ -95,4 +99,19 @@ export const useSignalRConnectionsStore = create<SignalRConnectionsStore>((set, 
   },
 }));
 
-export const useSignalRConnections = useSignalRConnectionsStore;
+export interface SignalRConfiguration {
+  backendUri: string;
+  enableDebug?: boolean;
+}
+
+/** Configure SignalR before mounting consumers. Backend switching is not supported. */
+export function configureSignalR({ backendUri, enableDebug = false }: SignalRConfiguration): void {
+  useSignalRConnectionsStore.setState({ backendUri, EnableSignalRDebug: enableDebug });
+}
+
+export function useSignalRConnections(): SignalRConnections {
+  const createConnection = useSignalRConnectionsStore((state) => state.createConnection);
+  const setupEventHandlers = useSignalRConnectionsStore((state) => state.setupEventHandlers);
+  const deleteConnection = useSignalRConnectionsStore((state) => state.deleteConnection);
+  return { createConnection, setupEventHandlers, deleteConnection };
+}

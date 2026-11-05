@@ -1,6 +1,6 @@
 {
   "name": "@signal-spec/react-client",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A SignalR client generator for React based on the SignalSpec.",
   "repository": {
     "type": "git",
@@ -25,7 +25,7 @@
     "test": "vp test",
     "check": "vp check",
     "prepublishOnly": "vp run build",
-    "generate": "node ./bin/signal-spec.mjs generate"
+    "generate": "node --use-system-ca ./bin/signal-spec.mjs generate --input=https://localhost:49363/api/signal-spec.json --output=./src/result --backend-uri=https://localhost:49363"
   },
   "dependencies": {
     "typesynth": "0.1.1",
